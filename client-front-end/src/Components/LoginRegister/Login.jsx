@@ -7,8 +7,11 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';  // นำเข้า useNavigate
 
 export const LoginRegister = () => {
+  const navigate = useNavigate();  // ประกาศ useNavigate
+
   const [action, setAction] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,72 +19,66 @@ export const LoginRegister = () => {
   const [phone, setPhone] = useState('');
 
   const handleRegister = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ตรวจสอบเบอร์โทรก่อน
-  if (!/^\d{10}$/.test(phone)) {
-    alert("กรุณากรอกเบอร์โทรให้ถูกต้อง (ตัวเลข 10 หลัก)");
-    return;
-  }
+    if (!/^[0-9]{10}$/.test(phone)) {
+      alert("กรุณากรอกเบอร์โทรให้ถูกต้อง (ตัวเลข 10 หลัก)");
+      return;
+    }
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    // บันทึกข้อมูลลง Firestore
-    await setDoc(doc(db, "users", user.uid), {
-      email: email,
-      username: username,
-      phone: phone
-    });
+      await setDoc(doc(db, "users", user.uid), {
+        email,
+        username,
+        phone
+      });
 
-    alert('สมัครสมาชิกสำเร็จ!');
-    setEmail('');
-    setPassword('');
-    setUsername('');
-    setPhone('');
-    setAction(''); // กลับไปหน้า login
-  } catch (error) {
-    alert('เกิดข้อผิดพลาด: ' + error.message);
-  }
-};
+      alert('สมัครสมาชิกสำเร็จ!');
+      setEmail('');
+      setPassword('');
+      setUsername('');
+      setPhone('');
+      setAction('');
+    } catch (error) {
+      alert('เกิดข้อผิดพลาด: ' + error.message);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert('เข้าสู่ระบบสำเร็จ!');
+      navigate('/products');  // เปลี่ยนหน้าไป ProductList หลัง login สำเร็จ
     } catch (error) {
       alert('เข้าสู่ระบบล้มเหลว: ' + error.message);
     }
   };
 
-  const registerLink = () => setAction('active');
-  const loginLink = () => setAction('');
+  const registerLink = (e) => {
+    e.preventDefault();
+    setAction('active');
+  };
+  const loginLink = (e) => {
+    e.preventDefault();
+    setAction('');
+  };
 
   return (
     <div className={`wrapper ${action}`}>
-      {/* เข้าสู่ระบบ */}
       <div className='form-box login'>
         <form onSubmit={handleLogin}>
           <h1>เข้าสู่ระบบ</h1>
           <div className="input-box">
             <span className="icon"><FaUser /></span>
-            <input
-              type="text"
-              placeholder="อีเมล"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="text" placeholder="อีเมล" required onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="input-box">
             <span className="icon"><FaUnlockAlt /></span>
-            <input
-              type="password"
-              placeholder="รหัสผ่าน"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" placeholder="รหัสผ่าน" required onChange={(e) => setPassword(e.target.value)} />
           </div>
           <button type="submit">เข้าสู่ระบบ</button>
           <div className="register-link">
@@ -90,45 +87,24 @@ export const LoginRegister = () => {
         </form>
       </div>
 
-      {/* สมัครสมาชิก */}
       <div className='form-box register'>
         <form onSubmit={handleRegister}>
           <h1>สมัครสมาชิก</h1>
           <div className="input-box">
             <span className="icon"><FaUser /></span>
-            <input
-              type="text"
-              placeholder="ชื่อผู้ใช้"
-              required
-              onChange={(e) => setUsername(e.target.value)}
-            />
+            <input type="text" placeholder="ชื่อผู้ใช้" required onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="input-box">
             <span className="icon"><FaEnvelope /></span>
-            <input
-              type="text"
-              placeholder="อีเมล"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="text" placeholder="อีเมล" required onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="input-box">
             <span className="icon"><FaPhone /></span>
-            <input
-              type="text"
-              placeholder="เบอร์โทร"
-              required
-              onChange={(e) => setPhone(e.target.value)}
-            />
+            <input type="text" placeholder="เบอร์โทร" required onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div className="input-box">
             <span className="icon"><FaUnlockAlt /></span>
-            <input
-              type="password"
-              placeholder="รหัสผ่าน"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" placeholder="รหัสผ่าน" required onChange={(e) => setPassword(e.target.value)} />
           </div>
           <button type="submit">ยืนยัน</button>
           <div className="register-link">
