@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginRegister from './Components/LoginRegister/Login';
-import ProductList from './Components/ProductList/ProductList';
+import ProductManager from './Pages/ProductManager';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
      <Router>
       <Routes>
         <Route path="/" element={<LoginRegister />} />
-        <Route path="/products" element={<ProductList />} />
+        <Route path="/products" element={<ProductManager />} />
       </Routes>
     </Router>
   );

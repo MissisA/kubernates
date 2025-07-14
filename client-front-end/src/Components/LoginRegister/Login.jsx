@@ -7,11 +7,10 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';  // นำเข้า useNavigate
+import { useNavigate } from 'react-router-dom';
 
 export const LoginRegister = () => {
-  const navigate = useNavigate();  // ประกาศ useNavigate
-
+  const navigate = useNavigate();
   const [action, setAction] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +32,8 @@ export const LoginRegister = () => {
       await setDoc(doc(db, "users", user.uid), {
         email,
         username,
-        phone
+        phone,
+        role: "user" // ✅ เพิ่ม role เพื่อให้ Firestore Rules ยอมให้ user CRUD
       });
 
       alert('สมัครสมาชิกสำเร็จ!');
@@ -43,6 +43,7 @@ export const LoginRegister = () => {
       setPhone('');
       setAction('');
     } catch (error) {
+      console.error("เกิดข้อผิดพลาด:", error);
       alert('เกิดข้อผิดพลาด: ' + error.message);
     }
   };
@@ -52,7 +53,7 @@ export const LoginRegister = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert('เข้าสู่ระบบสำเร็จ!');
-      navigate('/products');  // เปลี่ยนหน้าไป ProductList หลัง login สำเร็จ
+      navigate('/products');
     } catch (error) {
       alert('เข้าสู่ระบบล้มเหลว: ' + error.message);
     }
@@ -62,6 +63,7 @@ export const LoginRegister = () => {
     e.preventDefault();
     setAction('active');
   };
+
   const loginLink = (e) => {
     e.preventDefault();
     setAction('');
@@ -69,6 +71,7 @@ export const LoginRegister = () => {
 
   return (
     <div className={`wrapper ${action}`}>
+      {/* Login Form */}
       <div className='form-box login'>
         <form onSubmit={handleLogin}>
           <h1>เข้าสู่ระบบ</h1>
@@ -87,6 +90,7 @@ export const LoginRegister = () => {
         </form>
       </div>
 
+      {/* Register Form */}
       <div className='form-box register'>
         <form onSubmit={handleRegister}>
           <h1>สมัครสมาชิก</h1>
