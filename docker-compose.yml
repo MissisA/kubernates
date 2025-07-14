@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: ./server-back-end
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server-back-end/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /app/serviceAccountKey.json
+
+  frontend:
+    build: ./client-front-end
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
